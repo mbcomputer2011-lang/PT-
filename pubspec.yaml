@@ -16,7 +16,7 @@ jobs:
 
       # 2. ตั้งค่า Flutter SDK และกำหนด Working Directory
       - name: Setup Flutter SDK and define project root
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@v4
         with:
           # แนะนำให้ระบุเวอร์ชัน Flutter ที่ตรงกับ pubspec.yaml เช่น '3.19.6' หรือปล่อยเป็น '3.x.x'
           flutter-version: '3.x.x' 
