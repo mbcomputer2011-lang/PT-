@@ -1,21 +1,50 @@
-name: anti_lost_keychain
-description: Anti-Lost Keychain Flutter App (ESP32-C3) - demo project
-publish_to: "none"
-version: 1.0.0+1
-environment:
-  sdk: ">=2.18.0 <4.0.0"
+name: Build Flutter APK
 
-dependencies:
-  flutter:
-    sdk: flutter
-  flutter_reactive_ble: ^5.0.3
-  audioplayers: ^5.2.1
-  flutter_background: ^1.0.0
-  # add other packages as needed
+on:
+  push:
+    branches:
+      - main # หรือ branch หลักอื่นๆ ที่คุณใช้
 
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. ดึงโค้ดทั้งหมดจาก Repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. ตั้งค่า Flutter SDK และกำหนด Working Directory
+      - name: Setup Flutter SDK and define project root
+        uses: subosito/flutter-action@v2
+        with:
+          # แนะนำให้ระบุเวอร์ชัน Flutter ที่ตรงกับ pubspec.yaml เช่น '3.19.6' หรือปล่อยเป็น '3.x.x'
+          flutter-version: '3.x.x' 
+          channel: 'stable'
+          
+          # ********** การแก้ไขสำคัญ #1: กำหนด Working Directory **********
+          # บอก Actions ว่า Root ของโปรเจกต์ (ที่ pubspec.yaml อยู่) คือตรงนี้ (Root ของ Repo)
+          working-directory: ./
+          # *************************************************************
+
+      # 3. ดึง Dependencies
+      - name: Run flutter pub get
+        run: flutter pub get
+        # Actions จะรู้ Working Directory จากขั้นตอนที่ 2 แล้ว
+
+      # 4. Build APK
+      - name: Run Flutter build apk --release
+        run: flutter build apk --release
+        # Actions จะหา lib/main.dart เจอแล้ว เพราะเรารู้ Root Directory
+
+      # 5. อัปโหลด Artifact
+      # ********** การแก้ไขสำคัญ #2: อัปเดตเวอร์ชัน Artifact Action **********
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4 # แก้จาก v3 เป็น v4 เพื่อเลี่ยงข้อผิดพลาด Deprecated
+        with:
+          name: release-apk
+          path: build/app/outputs/flutter/apk/app-release.apk
+          # *************************************************************
 
 flutter:
   uses-material-design: true
