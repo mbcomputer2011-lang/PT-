@@ -1,47 +1,47 @@
-name: Build Flutter APK
+Name: Build Flutter APK
 
 on:
   push:
     branches:
-      - main # หรือ branch หลักอื่นๆ ของคุณ
-  pull_request:
-    branches:
-      - main
+      - main # หรือ branch หลักอื่นๆ ที่คุณใช้
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout โค้ด
-      - name: Checkout code
+      # 1. Checkout code: ดึงโค้ดทั้งหมดจาก Repository
+      - name: Checkout source code
         uses: actions/checkout@v4
 
-      # 2. ตั้งค่า Flutter SDK และกำหนด Root โปรเจกต์ (แก้ปัญหา A)
-      - name: Setup Flutter SDK and define project root
-        uses: subosito/flutter-action@v2
+      # 2. Setup Flutter SDK: ติดตั้ง Flutter SDK (ไม่มี working-directory ในส่วนนี้)
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2 # ใช้ v2 หรือ v4 ก็ได้
         with:
-          # คุณใช้ SDK >=2.18.0 <4.0.0 (cite: 1765127886025.jpeg) ให้เลือกเวอร์ชันที่เข้ากันได้ เช่น
-          flutter-version: '3.19.6' 
+          # ระบุเวอร์ชัน Flutter ที่คุณต้องการใช้งาน
+          flutter-version: '3.x.x' 
           channel: 'stable'
-          # ********** การแก้ไขที่ 1: กำหนด Working Directory **********
-          # การเพิ่มบรรทัดนี้เพื่อแก้ไขปัญหาหา pubspec.yaml และ lib/main.dart ไม่เจอ
-          working-directory: ./ 
-          # *************************************************************
 
-      # 3. ดึง Dependencies
-      - name: Run flutter pub get
+      # 3. Install dependencies: ดึง Dependencies และตั้งค่า working directory
+      - name: Install dependencies
         run: flutter pub get
+        # กำหนด working-directory ที่ Step นี้ (ใช้ ./ หาก pubspec.yaml อยู่ที่ root ของ repo)
+        working-directory: ./ 
 
-      # 4. Build APK
-      - name: Run Flutter build apk --release
+      # 4. Build APK (Release): ตั้งค่า working directory และสั่ง build
+      - name: Build Flutter App (Release)
         run: flutter build apk --release
+        # กำหนด working-directory ที่ Step นี้
+        working-directory: ./ 
 
-      # 5. อัปโหลด Artifact (แก้ปัญหา B)
-      - name: Upload APK artifact
-        # ********** การแก้ไขที่ 2: อัปเดตเวอร์ชัน Artifact Action **********
-        uses: actions/upload-artifact@v4 # เปลี่ยนจาก v3 เป็น v4
+      # 5. Upload APK artifact: อัปโหลดไฟล์ APK
+      - name: Upload Release APK
+        uses: actions/upload-artifact@v4
         with:
           name: release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
-          # *************************************************************
+          path: build/app/outputs/flutter/apk/app-release.apk
+
+# บล็อก 'flutter:' ด้านล่างนี้มักจะไม่อยู่ในไฟล์ GitHub Actions YAML 
+# หากคุณไม่แน่ใจว่ามันมาจากไหน กรุณาลบมันออก หรือหากมันคือส่วนหนึ่งของ pubspec.yaml ให้ปล่อยไว้ใน pubspec.yaml
+# flutter:
+#   uses-material-design: true
