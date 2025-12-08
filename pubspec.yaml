@@ -14,24 +14,24 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      # 2. Setup Flutter SDK: ติดตั้ง Flutter SDK (ไม่มี working-directory ในส่วนนี้)
+      # 2. Setup Flutter SDK: ติดตั้ง Flutter SDK (แก้ไข: ลบ working-directory ออกจาก with)
       - name: Install Flutter
-        uses: subosito/flutter-action@v2 # ใช้ v2 หรือ v4 ก็ได้
+        uses: subosito/flutter-action@v2 
         with:
           # ระบุเวอร์ชัน Flutter ที่คุณต้องการใช้งาน
           flutter-version: '3.x.x' 
           channel: 'stable'
 
-      # 3. Install dependencies: ดึง Dependencies และตั้งค่า working directory
+      # 3. Install dependencies: ดึง Dependencies
       - name: Install dependencies
         run: flutter pub get
-        # กำหนด working-directory ที่ Step นี้ (ใช้ ./ หาก pubspec.yaml อยู่ที่ root ของ repo)
+        # สำคัญ: ต้องกำหนด working-directory ที่ Step นี้
         working-directory: ./ 
 
-      # 4. Build APK (Release): ตั้งค่า working directory และสั่ง build
+      # 4. Build APK (Release): สั่ง build
       - name: Build Flutter App (Release)
         run: flutter build apk --release
-        # กำหนด working-directory ที่ Step นี้
+        # สำคัญ: ต้องกำหนด working-directory ที่ Step นี้
         working-directory: ./ 
 
       # 5. Upload APK artifact: อัปโหลดไฟล์ APK
@@ -40,8 +40,3 @@ jobs:
         with:
           name: release-apk
           path: build/app/outputs/flutter/apk/app-release.apk
-
-# บล็อก 'flutter:' ด้านล่างนี้มักจะไม่อยู่ในไฟล์ GitHub Actions YAML 
-# หากคุณไม่แน่ใจว่ามันมาจากไหน กรุณาลบมันออก หรือหากมันคือส่วนหนึ่งของ pubspec.yaml ให้ปล่อยไว้ใน pubspec.yaml
-# flutter:
-#   uses-material-design: true
