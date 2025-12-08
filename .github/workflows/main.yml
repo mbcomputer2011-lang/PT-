@@ -1,24 +1,44 @@
-name: Simple CI Workflow
- 
+name: Flutter APK Build
+
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
- 
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v4
- 
-    - name: Build APK
-      run: |
-        mkdir build
-        echo "YOUR APK CONTENT HERE" > build/myfile.apk
- 
-    - name: Upload APK Artifact
+    - name: Checkout source code
+      uses: actions/checkout@v4
+
+    - name: Install Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.22.0'  # เวอร์ชันสามารถเปลี่ยนได้
+
+    - name: Flutter clean
+      run: flutter clean
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Build Flutter App (Release)
+      run: flutter build apk --release
+
+    - name: Upload Release APK
       uses: actions/upload-artifact@v4
       with:
         name: app-release
-        path: build/*.apk
+        path: build/app/outputs/flutter-apk/*.apk
+
+    - name: Build Flutter App (Debug)
+      run: flutter build apk --debug
+
+    - name: Upload Debug APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-debug
+        path: build/app/outputs/flutter-apk/*.apk
