@@ -12,14 +12,14 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Build ADK
+    - name: Build APK
       run: |
         # ตัวอย่างคำสั่ง (แทนที่ด้วยคำสั่งที่ใช้สร้างไฟล์ ADK จริง)
         mkdir build
-        echo "YOUR ADK CONTENT HERE" > build/myfile.adk
+        echo "YOUR APK CONTENT HERE" > build/myfile.adk
 
-    - name: Upload ADK Artifact
+    - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ADK-file
+        name: APK-file
         path: build/
