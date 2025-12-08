@@ -1,42 +1,37 @@
-Name: Build Flutter APK
+name: Build Flutter APK
 
 on:
   push:
     branches:
-      - main # หรือ branch หลักอื่นๆ ที่คุณใช้
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout code: ดึงโค้ดทั้งหมดจาก Repository
-      - name: Checkout source code
-        uses: actions/checkout@v4
+      # 1. Checkout code
+    - name: Checkout source code
+      uses: actions/checkout@v4
 
-      # 2. Setup Flutter SDK: ติดตั้ง Flutter SDK (แก้ไข: ลบ working-directory ออกจาก with)
-      - name: Install Flutter
-        uses: subosito/flutter-action@v2 
-        with:
-          # ระบุเวอร์ชัน Flutter ที่คุณต้องการใช้งาน
-          flutter-version: '3.x.x' 
-          channel: 'stable'
+      # 2. Install Flutter SDK
+    - name: Install Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.4.0'
+        channel: 'stable'
 
-      # 3. Install dependencies: ดึง Dependencies
-      - name: Install dependencies
-        run: flutter pub get
-        # สำคัญ: ต้องกำหนด working-directory ที่ Step นี้
-        working-directory: ./ 
+      # 3. Install dependencies
+    - name: Install dependencies
+      run: flutter pub get
 
-      # 4. Build APK (Release): สั่ง build
-      - name: Build Flutter App (Release)
-        run: flutter build apk --release
-        # สำคัญ: ต้องกำหนด working-directory ที่ Step นี้
-        working-directory: ./ 
+      # 4. Build APK (Release)
+    - name: Build Flutter App (Release)
+      run: flutter build apk --release
 
-      # 5. Upload APK artifact: อัปโหลดไฟล์ APK
-      - name: Upload Release APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-apk
-          path: build/app/outputs/flutter/apk/app-release.apk
+      # 5. Upload APK artifact
+    - name: Upload Release APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-apk
+        path: build/app/outputs/flutter-apk/app-release.apk
