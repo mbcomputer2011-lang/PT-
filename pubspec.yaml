@@ -1,48 +1,47 @@
-name: Flutter Android Build
+name: Flutter Android Build # ชื่อของ Workflow
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main ] # Trigger เมื่อมีการ push ไปที่ branch main
   pull_request:
+    branches: [ main ] # Trigger เมื่อมี Pull Request ไปที่ branch main
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # รันบน Ubuntu รุ่นล่าสุด
 
     steps:
-      # 1. Checkout source code
-      - name: Checkout code
+      - name: 1. Checkout code 📦 # ดึงโค้ดจาก Repository
         uses: actions/checkout@v4
 
-      # 2. Setup Flutter SDK
-      - name: Setup Flutter SDK
-        uses: subosito/flutter-action@v4
+      - name: 2. Setup Flutter SDK ⚙️ # ติดตั้ง Flutter SDK
+        # เปลี่ยนไปใช้ action ที่นิยมและดูแลรักษาอย่างดี
+        uses: subosito/flutter-action@v2 
         with:
-          flutter-version: '3.19.6'   # แนะนำให้ fix version เพื่อความเสถียร
-          channel: 'stable'
+          flutter-version: '3.19.6' # ระบุเวอร์ชันที่คุณต้องการ
+          channel: 'stable' # ใช้ channel stable
 
-      # 3. Cache pub packages (ทำให้ build เร็วขึ้น)
-      - name: Cache Flutter packages
+      - name: 3. Install Dependencies 💻 # รัน pub get เพื่อติดตั้ง dependencies
+        run: flutter pub get
+        # ไม่จำเป็นต้องระบุ working-directory หาก pubspec.yaml อยู่ที่ Root ของ project
+
+      - name: 4. Cache Flutter Packages 💾 # Cache package เพื่อลดเวลาในการ build ครั้งต่อไป
         uses: actions/cache@v4
         with:
           path: |
             ~/.pub-cache
-            build
-          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.yaml') }}
+          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }} # ใช้ pubspec.lock เพื่อความแม่นยำ
 
-      # 4. flutter pub get
-      - name: Run flutter pub get
-        run: flutter pub get
-        working-directory: ./
-
-      # 5. Build APK Release
-      - name: Run Flutter build apk --release
+      - name: 5. Build Flutter APK - Release 🚀 # สร้าง APK ในโหมด Release
+        # เพิ่ม run: ก่อนคำสั่ง
         run: flutter build apk --release
-        working-directory: ./
+        # ไม่ต้องระบุ working-directory หากคำสั่งรันจาก Root ของ project
 
-      # 6. Upload APK artifact
-      - name: Upload APK artifact
+      - name: 6. Upload APK artifact ⬆️ # Upload ไฟล์ APK ที่สร้างได้เป็น Artifact
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
+          # Path ที่ถูกต้องคือ build/app/outputs/flutter-apk/app-release.apk
+
+      # คุณอาจเพิ่มขั้นตอนอื่นๆ เช่น การ Run Tests หรือ การเซ็นชื่อ APK ที่นี่
