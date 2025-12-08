@@ -3,39 +3,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. ดึงโค้ดทั้งหมดจาก Repository
+      # 1. Checkout code: ดึงโค้ดทั้งหมดจาก Repository
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. ตั้งค่า Flutter SDK
-      # ********** การแก้ไข: ลบ 'working-directory: ./' ออกจากบล็อก 'with' **********
+      # 2. Setup Flutter SDK: ติดตั้ง Flutter SDK
+      # ************************************************************
+      # Action นี้ไม่รองรับ 'working-directory' จึงต้องลบออก
       - name: Setup Flutter SDK
         uses: subosito/flutter-action@v4
         with:
-          flutter-version: '3.x.x' # ใช้ตามที่คุณระบุ
+          # แนะนำให้ใช้เวอร์ชันที่แน่นอน เช่น '3.19.6' แทน '3.x.x' เพื่อความเสถียร
+          flutter-version: '3.19.6' 
           channel: 'stable'
-      # **************************************************************************
+      # ************************************************************
 
-      # 3. ดึง Dependencies (ย้าย working-directory มาไว้ที่ Step นี้)
+      # 3. Run flutter pub get: ดึง Dependencies
       - name: Run flutter pub get
         run: flutter pub get
-        # ********** การแก้ไข: กำหนด working-directory ที่นี่ **********
+        # กำหนด working-directory ที่ Step นี้ เนื่องจากเป็น Step ที่ใช้คำสั่ง 'flutter'
         working-directory: ./ 
-        # **********************************************************
 
-      # 4. Build APK (กำหนด working-directory ที่ Step นี้)
+      # 4. Build APK
       - name: Run Flutter build apk --release
         run: flutter build apk --release
-        # ********** การแก้ไข: กำหนด working-directory ที่นี่ **********
+        # กำหนด working-directory ที่ Step นี้
         working-directory: ./ 
-        # **********************************************************
 
-      # 5. อัปโหลด Artifact
+      # 5. Upload APK artifact: อัปโหลดไฟล์ APK
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
           path: build/app/outputs/flutter/apk/app-release.apk
 
-flutter:
-  uses-material-design: true
+# บล็อก 'flutter:' นี้อยู่นอก jobs block และมักไม่จำเป็นในไฟล์ GitHub Actions YAML
+# หากโค้ดนี้อยู่ในไฟล์ CI/CD:
+# flutter:
+#   uses-material-design: true
