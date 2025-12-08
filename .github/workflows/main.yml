@@ -1,45 +1,19 @@
-name: Build Flutter APK
+name: Simple CI Workflow
 
 on:
   push:
-    branches:
-      - main # หรือ branch หลักอื่นๆ ของคุณ เช่น master
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      # 1. Checkout โค้ด
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      # 2. ตั้งค่า Flutter SDK และกำหนด Root โปรเจกต์ (แก้ปัญหา A)
-      - name: Setup Flutter SDK and define project root
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.x.x' # ใช้เวอร์ชันที่ต้องการ
-          channel: 'stable'
-          # ********** การแก้ไขที่ 1: กำหนด Working Directory **********
-          working-directory: ./ # ระบุว่า pubspec.yaml อยู่ที่ Root ของ Repo
-          # *************************************************************
-
-      # 3. ดึง Dependencies
-      - name: Run flutter pub get
-        run: flutter pub get
-
-      # 4. Build APK
-      - name: Run Flutter build apk --release
-        run: flutter build apk --release
-
-      # 5. อัปโหลด Artifact (แก้ปัญหา B)
-      - name: Upload APK artifact
-        # ********** การแก้ไขที่ 2: อัปเดตเวอร์ชัน Artifact Action **********
-        uses: actions/upload-artifact@v4 # เปลี่ยนจาก v3 เป็น v4
-        with:
-          name: release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk # อาจจะต้องแก้ path ตามโครงสร้างของ Flutter ล่าสุด
-          # *************************************************************
+    - uses: actions/checkout@v4
+    - name: Run a one-line script
+      run: echo Hello, GitHub Actions!
+    - name: Run a multi-line script
+      run: |
+        echo Add other build steps here,
+        echo for example, running your tests.
