@@ -11,9 +11,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Run a one-line script
-      run: echo Hello, GitHub Actions!
-    - name: Run a multi-line script
+
+    - name: Build ADK
       run: |
-        echo Add other build steps here,
-        echo for example, running your tests.
+        # ตัวอย่างคำสั่ง (แทนที่ด้วยคำสั่งที่ใช้สร้างไฟล์ ADK จริง)
+        mkdir build
+        echo "YOUR ADK CONTENT HERE" > build/myfile.adk
+
+    - name: Upload ADK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ADK-file
+        path: build/
