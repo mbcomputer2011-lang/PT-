@@ -14,12 +14,12 @@ jobs:
 
     - name: Build APK
       run: |
-        # ตัวอย่างคำสั่ง (แทนที่ด้วยคำสั่งที่ใช้สร้างไฟล์ ADK จริง)
+        # ตัวอย่างคำสั่ง (แทนที่ด้วยคำสั่งที่ใช้สร้างไฟล์ APK จริง)
         mkdir build
-        echo "YOUR APK CONTENT HERE" > build/myfile.adk
+        echo "YOUR APK CONTENT HERE" > build/myfile.apk
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
       with:
         name: app-release
-        path: app/build/outputs/apk/release/*.apk
+        path: app/build/outputs/apk/Artifact/*.apk
