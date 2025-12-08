@@ -1,47 +1,47 @@
-name: Flutter Android Build # ชื่อของ Workflow
+name: Build Flutter APK
 
 on:
   push:
-    branches: [ main ] # Trigger เมื่อมีการ push ไปที่ branch main
+    branches:
+      - main # หรือ branch หลักอื่นๆ ของคุณ
   pull_request:
-    branches: [ main ] # Trigger เมื่อมี Pull Request ไปที่ branch main
+    branches:
+      - main
 
 jobs:
   build:
-    runs-on: ubuntu-latest # รันบน Ubuntu รุ่นล่าสุด
+    runs-on: ubuntu-latest
 
     steps:
-      - name: 1. Checkout code 📦 # ดึงโค้ดจาก Repository
+      # 1. Checkout โค้ด
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: 2. Setup Flutter SDK ⚙️ # ติดตั้ง Flutter SDK
-        # เปลี่ยนไปใช้ action ที่นิยมและดูแลรักษาอย่างดี
-        uses: subosito/flutter-action@v2 
+      # 2. ตั้งค่า Flutter SDK และกำหนด Root โปรเจกต์ (แก้ปัญหา A)
+      - name: Setup Flutter SDK and define project root
+        uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.6' # ระบุเวอร์ชันที่คุณต้องการ
-          channel: 'stable' # ใช้ channel stable
+          # คุณใช้ SDK >=2.18.0 <4.0.0 (cite: 1765127886025.jpeg) ให้เลือกเวอร์ชันที่เข้ากันได้ เช่น
+          flutter-version: '3.19.6' 
+          channel: 'stable'
+          # ********** การแก้ไขที่ 1: กำหนด Working Directory **********
+          # การเพิ่มบรรทัดนี้เพื่อแก้ไขปัญหาหา pubspec.yaml และ lib/main.dart ไม่เจอ
+          working-directory: ./ 
+          # *************************************************************
 
-      - name: 3. Install Dependencies 💻 # รัน pub get เพื่อติดตั้ง dependencies
+      # 3. ดึง Dependencies
+      - name: Run flutter pub get
         run: flutter pub get
-        # ไม่จำเป็นต้องระบุ working-directory หาก pubspec.yaml อยู่ที่ Root ของ project
 
-      - name: 4. Cache Flutter Packages 💾 # Cache package เพื่อลดเวลาในการ build ครั้งต่อไป
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.pub-cache
-          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }} # ใช้ pubspec.lock เพื่อความแม่นยำ
-
-      - name: 5. Build Flutter APK - Release 🚀 # สร้าง APK ในโหมด Release
-        # เพิ่ม run: ก่อนคำสั่ง
+      # 4. Build APK
+      - name: Run Flutter build apk --release
         run: flutter build apk --release
-        # ไม่ต้องระบุ working-directory หากคำสั่งรันจาก Root ของ project
 
-      - name: 6. Upload APK artifact ⬆️ # Upload ไฟล์ APK ที่สร้างได้เป็น Artifact
-        uses: actions/upload-artifact@v4
+      # 5. อัปโหลด Artifact (แก้ปัญหา B)
+      - name: Upload APK artifact
+        # ********** การแก้ไขที่ 2: อัปเดตเวอร์ชัน Artifact Action **********
+        uses: actions/upload-artifact@v4 # เปลี่ยนจาก v3 เป็น v4
         with:
           name: release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
-          # Path ที่ถูกต้องคือ build/app/outputs/flutter-apk/app-release.apk
-
-      # คุณอาจเพิ่มขั้นตอนอื่นๆ เช่น การ Run Tests หรือ การเซ็นชื่อ APK ที่นี่
+          # *************************************************************
